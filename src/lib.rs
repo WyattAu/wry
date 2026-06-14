@@ -2059,6 +2059,18 @@ pub trait WebViewBuilderExtUnix<'a> {
   /// Creates a new webview sharing the same web process with the provided webview.
   /// Useful if you need to link a webview to another, for instance when using the [`WebViewBuilder::with_new_window_req_handler`].
   fn with_related_view(self, webview: webkit2gtk::WebView) -> Self;
+
+  /// Consume the builder and create the webview inside a GTK4 window.
+  ///
+  /// This method creates a GTK4 window and attempts to embed a WebKitGTK webview.
+  /// Note that WebKitGTK is GTK3-based, so there may be compatibility issues
+  /// with embedding in a GTK4 window.
+  ///
+  /// # Panics:
+  ///
+  /// - Panics if GTK4 initialization fails.
+  #[cfg(feature = "gtk4-window")]
+  fn build_with_gtk4_window(self) -> Result<WebView>;
 }
 
 #[cfg(any(
@@ -2087,6 +2099,13 @@ impl<'a> WebViewBuilderExtUnix<'a> for WebViewBuilder<'a> {
   fn with_related_view(mut self, webview: webkit2gtk::WebView) -> Self {
     self.platform_specific.related_view.replace(webview);
     self
+  }
+
+  #[cfg(feature = "gtk4-window")]
+  fn build_with_gtk4_window(self) -> Result<WebView> {
+    self.error?;
+
+    crate::webkitgtk::build_with_gtk4_window(self.attrs, self.platform_specific)
   }
 }
 

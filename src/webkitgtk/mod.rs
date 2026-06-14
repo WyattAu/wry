@@ -415,6 +415,24 @@ impl InnerWebView {
     builder.build()
   }
 
+  #[cfg(feature = "gtk4-window")]
+  fn create_webview_for_gtk4(
+    attributes: &WebViewAttributes,
+    pl_attrs: &super::PlatformSpecificWebViewAttributes,
+  ) -> WebView {
+    // Create a web context for the webview
+    let mut default_context;
+    let web_context = if attributes.incognito {
+      default_context = WebContext::new_ephemeral();
+      &mut default_context
+    } else {
+      default_context = Default::default();
+      &mut default_context
+    };
+
+    Self::create_webview(web_context, attributes, pl_attrs)
+  }
+
   fn set_webview_settings(webview: &WebView, attributes: &WebViewAttributes) {
     // Disable input preedit,fcitx input editor can anchor at edit cursor position
     if let Some(input_context) = webview.input_method_context() {
@@ -1236,6 +1254,60 @@ pub fn platform_webview_version() -> Result<String> {
     )
   };
   Ok(format!("{major}.{minor}.{patch}"))
+}
+
+#[cfg(feature = "gtk4-window")]
+pub fn build_with_gtk4_window(
+  attributes: WebViewAttributes,
+  pl_attrs: super::PlatformSpecificWebViewAttributes,
+) -> Result<crate::WebView> {
+  use gtk4_window::{App, Window};
+
+  // Create GTK4 application
+  let app = App::new("com.ferro.webview");
+
+  // Create GTK4 window
+  let window = Window::new(app.gtk_app());
+  window.set_title("WebView");
+  window.set_default_size(800, 600);
+
+  // Create WebKitGTK webview (still GTK3-based)
+  // Note: This creates a GTK3-based WebKitGTK webview.
+  // The webview cannot be directly embedded in the GTK4 window
+  // due to GTK3/GTK4 incompatibility. This method creates the
+  // window structure but the webview must be embedded separately.
+  let webkit_webview = InnerWebView::create_webview_for_gtk4(&attributes, &pl_attrs);
+
+  // Show window
+  window.show();
+
+  // Run GTK main loop
+  // Note: This will block until the window is closed.
+  // In a real application, you would need to integrate this
+  // with your application's event loop.
+  app.run();
+
+  // Create the InnerWebView with the webkit webview
+  let id = attributes
+    .id
+    .map(|id| id.to_string())
+    .unwrap_or_else(|| (webkit_webview.as_ptr() as isize).to_string());
+  unsafe { webkit_webview.set_data(WEBVIEW_ID, id.clone()) };
+
+  let inner_webview = InnerWebView {
+    id,
+    webview: webkit_webview,
+    pending_scripts: Arc::new(Mutex::new(Some(Vec::new()))),
+    is_in_fixed_parent: false,
+    #[cfg(feature = "x11")]
+    x11: None,
+    #[cfg(any(debug_assertions, feature = "devtools"))]
+    is_inspector_open: Arc::new(AtomicBool::default()),
+  };
+
+  Ok(crate::WebView {
+    webview: inner_webview,
+  })
 }
 
 // SAFETY: only use this when you are sure the span will be dropped on the same thread it was entered

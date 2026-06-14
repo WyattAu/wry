@@ -1,4 +1,4 @@
-workspace = {}
+workspace = { members = ["crates/gtk4-window"] }
 
 [package]
 name = "wry"
@@ -41,6 +41,7 @@ os-webview = [
 ]
 x11 = ["x11-dl", "gdkx11", "tao/x11"]
 tracing = ["dep:tracing"]
+gtk4-window = ["dep:gtk4-window"]
 
 [dependencies]
 tracing = { version = "0.1", optional = true }
@@ -50,6 +51,7 @@ http = "1.1"
 raw-window-handle = { version = "0.6", features = ["std"] }
 dpi = "0.1"
 cookie = "0.18"
+gtk4-window = { path = "crates/gtk4-window", optional = true }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
 javascriptcore-rs = { version = "=1.1.2", features = [
