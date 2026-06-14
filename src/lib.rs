@@ -1534,6 +1534,16 @@ impl<'a> WebViewBuilder<'a> {
   pub fn build<W: HasWindowHandle>(self, window: &'a W) -> Result<WebView> {
     self.error?;
 
+    #[cfg(target_os = "linux")]
+    {
+      // Auto-detect Wayland and use GTK path if needed
+      if std::env::var("WAYLAND_DISPLAY").is_ok() {
+        // On Wayland, the caller must use build_gtk() directly
+        // This method cannot work on Wayland due to X11 window handle requirement
+        return Err(Error::UnsupportedWindowHandle);
+      }
+    }
+
     InnerWebView::new(window, self.attrs, self.platform_specific).map(|webview| WebView { webview })
   }
 
@@ -1561,6 +1571,14 @@ impl<'a> WebViewBuilder<'a> {
   /// - Panics on Linux, if [`gtk::init`] was not called in this thread.
   pub fn build_as_child<W: HasWindowHandle>(self, window: &'a W) -> Result<WebView> {
     self.error?;
+
+    #[cfg(target_os = "linux")]
+    {
+      // On Wayland, the caller must use build_gtk() directly
+      if std::env::var("WAYLAND_DISPLAY").is_ok() {
+        return Err(Error::UnsupportedWindowHandle);
+      }
+    }
 
     InnerWebView::new_as_child(window, self.attrs, self.platform_specific)
       .map(|webview| WebView { webview })
