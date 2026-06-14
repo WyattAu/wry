@@ -1,0 +1,18 @@
+[package]
+name = "webkit2gtk4_1-sys"
+version = "0.1.0"
+edition = "2021"
+description = "Rust FFI bindings for webkit2gtk-4.1 (Wayland-compatible)"
+license = "MIT"
+
+[build-dependencies]
+pkg-config = "0.3"
+
+[dependencies]
+glib = "0.18"
+gio = "0.18"
+gdk = "0.18"
+gtk = "0.18"
+soup3 = "0.5"
+javascriptcore-rs = "1.1"
+libc = "0.2"

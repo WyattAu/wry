@@ -3424,6 +3424,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "webkit2gtk4_1-sys"
+version = "0.1.0"
+dependencies = [
+ "gdk",
+ "gio",
+ "glib",
+ "gtk",
+ "javascriptcore-rs",
+ "libc",
+ "pkg-config",
+ "soup3",
+]
+
+[[package]]
 name = "webview2-com"
 version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4105,6 +4119,7 @@ dependencies = [
  "url",
  "webkit2gtk",
  "webkit2gtk-sys",
+ "webkit2gtk4_1-sys",
  "webview2-com",
  "wgpu",
  "windows 0.61.1",
