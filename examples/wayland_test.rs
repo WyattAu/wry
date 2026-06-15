@@ -17,12 +17,11 @@ fn main() {
         let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
         window.add(&vbox);
 
-        let webview = WebViewBuilder::new()
+        let _webview = WebViewBuilder::new()
             .with_url("https://example.com")
             .build_gtk(&vbox)
             .expect("Failed to create webview");
 
-        webview.show_all();
         window.show_all();
     });
 

@@ -2014,7 +2014,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 2.0.2",
+ "proc-macro-crate 3.5.0",
  "proc-macro2",
  "quote",
  "syn 2.0.98",
@@ -4521,6 +4521,7 @@ dependencies = [
  "getrandom 0.3.1",
  "glow 0.16.0",
  "gtk",
+ "gtk4",
  "gtk4-window",
  "http",
  "http-range",
