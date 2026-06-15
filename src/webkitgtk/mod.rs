@@ -1275,13 +1275,10 @@ pub fn build_with_gtk4_window(
     gtk3_window.show_all();
   }
 
-  // Run the GTK3 main loop on the current thread.
-  // This is a blocking call - the caller should spawn this on a background thread
-  // if they need to run a GTK4 main loop concurrently.
-  // For now, we start the GTK3 loop which handles the webview.
-  std::thread::spawn(move || {
-    gtk::main();
-  });
+  // Run the GTK3 main loop. This is a blocking call that keeps the webview alive.
+  // The function returns the WebView handle but gtk::main() blocks until the
+  // GTK window is closed. Callers should be aware this blocks the calling thread.
+  gtk::main();
 
   Ok(crate::WebView { webview })
 }
